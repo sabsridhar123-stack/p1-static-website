@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DevOpsLearner | Static Site</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🚀 DevOpsLearner — Static Site on S3 + CloudFront</h1>
+    <p>Built with Git, Linux, AWS. Deployed via GitHub Actions.</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Stack</h2>
+      <ul>
+        <li>Amazon S3 (private) + CloudFront (OAC)</li>
+        <li>Optional: Route 53 + ACM (HTTPS on your domain)</li>
+        <li>CI/CD: GitHub Actions</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Change me!</h2>
+      <p>Make a commit and watch the pipeline deploy automatically.</p>
+    </section>
+  </main>
+  <footer>© <span id="y"></span> DevOpsLearner</footer>
+  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+</body>
+</html>
