@@ -1,12 +1,10 @@
 # Goal & Architecture
- 
 * S3 (private) stores your static site.
 * CloudFront serves it over HTTPS with caching. Access to S3 is locked down via Origin Access Control (OAC).
 * (Optional) Route 53 + ACM for your own domain.
 * GitHub Actions deploys on every push.
-
+  
 # Names we’ll use (feel free to keep them)
- 
 * Project alias: devopslearner
 * S3 bucket: p1-devopslearner-static-ap-south-1(must be globally unique; append a random suffix if needed)
 * CloudFront OAC: oac-p1-devopslearner
@@ -17,18 +15,12 @@
 * Region: ap-south-1 (except ACM for CloudFront: us-east-1)
  
 # Part A — Local repo & site code
- 
-## 1) Create repo & scaffold
- 
-bash
+## 1) Create repo
 # Local folder
 mkdir p1-static-website && cd p1-static-website
 git init
 git branch -M main
- 
 #Repo structure
- 
-
 p1-static-website/
 ├─ site/
 │  ├─ index.html
@@ -40,18 +32,13 @@ p1-static-website/
 └─ .github/
    └─ workflows/
       └─ deploy.yml
-
- 
-.gitignore
- 
+#.gitignore
 .DS_Store
 node_modules
 dist
 .env
 
 ##site/index.html
- 
-html
 <!doctype html>
 <html lang="en">
 <head>
@@ -85,16 +72,12 @@ html
 </html>
 
 ##site/error.html
- 
-html
 <!doctype html>
 <html><head><meta charset="utf-8"><title>Oops!</title>
 <link rel="stylesheet" href="assets/style.css" /></head>
 <body><main class="card"><h1>404 / Error</h1><p>Something went wrong.</p></main></body></html>
 
 ##site/assets/style.css
- 
-css
 :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
 body { margin: 0; background: #0f172a; color: #e2e8f0; }
 header { padding: 48px 24px; text-align: center; background: #111827; }
@@ -104,18 +87,12 @@ main { max-width: 900px; margin: 24px auto; padding: 0 16px; }
 footer { text-align: center; padding: 24px; opacity: .7; }
 a { color: #93c5fd; }
 
-Commit:
- 
-bash
+#Commit:
 git add .
 git commit -m "feat: initial static site"
 
-# Part B — AWS setup (S3 + CloudFront with OAC)
- 
+# Part B — AWS setup (S3 + CloudFront with OAC) 
 ## 2) Create S3 bucket (private)
- 
-Console
- 
 1. S3 → Create bucket
 2. Name: p1-devopslearner-static-ap-south-1
 3. Region: ap-south-1
@@ -124,8 +101,6 @@ Console
 6. Create bucket.
  
 CLI
- 
-bash
 aws s3api create-bucket \
   --bucket p1-devopslearner-static-ap-south-1 \
   --region ap-south-1 \
@@ -135,13 +110,10 @@ aws s3api put-bucket-versioning \
   --bucket p1-devopslearner-static-ap-south-1 \
   --versioning-configuration Status=Enabled
 
- 
 > We’re not enabling “Static website hosting” on S3 because CloudFront will use the REST endpoint with OAC.
- 
+
 ## 3) Create CloudFront distribution with OAC
- 
 Console (recommended)
- 
 1. Go to CloudFront → Create distribution.
 2. Origin
  
@@ -213,32 +185,18 @@ Save the policy.
 # Part C — First manual upload & test
  
 ## 4) Upload the site to S3 (one-time manual test)
- 
-CLI (from repo root)
- 
-bash
-
+ CLI (from repo root)
 # Upload everything under ./site to the bucket
 aws s3 sync ./site s3://p1-devopslearner-static-ap-south-1 --delete
-
- 
 Set sensible Cache-Control (optional)
- 
-bash
 # Example: short cache for HTML, longer for assets
 aws s3 cp site/index.html s3://p1-devopslearner-static-ap-south-1/index.html --cache-control "max-age=300,public" --content-type "text/html"
 aws s3 cp site/error.html s3://p1-devopslearner-static-ap-south-1/error.html --cache-control "max-age=300,public" --content-type "text/html"
 aws s3 cp site/assets/style.css s3://p1-devopslearner-static-ap-south-1/assets/style.css --cache-control "max-age=31536000,public" --content-type "text/css"
-
- 
 ## 5) Create a CloudFront invalidation (to see fresh content)
- 
-bash
 aws cloudfront create-invalidation \
   --distribution-id <DISTRIBUTION_ID> \
   --paths "/*"
-
- 
 ## 6) Test
  
 * Open the CloudFront domain (like https://dxxxxx.cloudfront.net/) → you should see your site.
